@@ -3,7 +3,10 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(which gh:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(gh repo:*)",
+      "Bash(npx netlify-cli:*)",
+      "Bash(cp -R /Users/tyrel/meal-bank-app /Users/tyrel/Desktop/meal-bank-app)"
     ]
   }
 }

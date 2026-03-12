@@ -46,3 +46,6 @@ export interface GroceryItem {
   checked: boolean;
   fromRecipe?: string;
 }
+
+// Keys are "YYYY-MM-DD:breakfast" | "YYYY-MM-DD:lunch" | "YYYY-MM-DD:dinner"
+export type CookedMeals = Record<string, boolean>;
