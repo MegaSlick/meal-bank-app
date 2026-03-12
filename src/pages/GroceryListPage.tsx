@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { recipes } from '../data/recipes';
 import { pantryCategories } from '../data/pantry';
-import type { GroceryItem, WeekPlan } from '../types';
+import { getDepletedItems } from '../utils/pantryDepletion';
+import type { GroceryItem, WeekPlan, CookedMeals } from '../types';
 
 const GROCERY_CATEGORIES = ['Produce', 'Meat & Seafood', 'Dairy & Eggs', 'Canned & Pantry', 'Grains & Bread', 'Frozen', 'Spices', 'Other'];
 
@@ -29,9 +30,12 @@ function categorizePantryItem(itemName: string): string {
 export default function GroceryListPage() {
   const [items, setItems] = useLocalStorage<GroceryItem[]>('grocerylist-v1', []);
   const [plan] = useLocalStorage<WeekPlan>('mealplan-v1', {});
+  const [cooked] = useLocalStorage<CookedMeals>('cooked-v1', {});
+  const [pantry] = useLocalStorage<Record<string, boolean>>('pantry-v1', {});
   const [newItem, setNewItem] = useState('');
   const [newCategory, setNewCategory] = useState('Other');
   const [showChecked, setShowChecked] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(true);
 
   function addItem() {
     const name = newItem.trim();
@@ -98,6 +102,59 @@ export default function GroceryListPage() {
     setItems(prev => [...prev, ...toAdd]);
   }
 
+  function addSuggestionToList(itemName: string) {
+    const existing = items.some(i => i.name.toLowerCase() === itemName.toLowerCase());
+    if (existing) return;
+    setItems(prev => [...prev, {
+      id: generateId(),
+      name: itemName,
+      category: categorizePantryItem(itemName),
+      checked: false,
+    }]);
+  }
+
+  // Smart suggestions: find recently cooked recipes and identify depleted pantry items
+  const suggestedRestocks = (() => {
+    const cookedRecipeIds = new Set<string>();
+    Object.keys(cooked).forEach(key => {
+      // Keys are "YYYY-MM-DD:mealType" or "YYYY-MM-DD:cook-mode-recipeId"
+      const parts = key.split(':');
+      if (parts.length >= 2) {
+        const mealPart = parts[1];
+        if (mealPart.startsWith('cook-mode-')) {
+          cookedRecipeIds.add(mealPart.replace('cook-mode-', ''));
+        } else {
+          // It's a planner meal - look up the recipe from the plan
+          const dateKey = parts[0];
+          const day = plan[dateKey];
+          if (day) {
+            const rid = (day as Record<string, string | undefined>)[mealPart];
+            if (rid) cookedRecipeIds.add(rid);
+          }
+        }
+      }
+    });
+
+    if (cookedRecipeIds.size === 0) return [];
+
+    const allDepleted = new Set<string>();
+    cookedRecipeIds.forEach(rid => {
+      const recipe = recipes.find(r => r.id === rid);
+      if (!recipe) return;
+      const depleted = getDepletedItems(
+        // Check against a "fully stocked" state to find what WOULD be depleted
+        Object.fromEntries(Object.values(pantryCategories).flat().map(i => [i, true])),
+        recipe.ingredients
+      );
+      depleted.forEach(d => allDepleted.add(d));
+    });
+
+    // Only suggest items not currently in stock
+    const existingNames = new Set(items.map(i => i.name.toLowerCase()));
+    return Array.from(allDepleted)
+      .filter(item => !pantry[item] && !existingNames.has(item.toLowerCase()));
+  })();
+
   const visibleItems = showChecked ? items : items.filter(i => !i.checked);
 
   const grouped = GROCERY_CATEGORIES.reduce<Record<string, GroceryItem[]>>((acc, cat) => {
@@ -106,7 +163,6 @@ export default function GroceryListPage() {
     return acc;
   }, {});
 
-  // Items with unknown category
   const otherCat = visibleItems.filter(i => !GROCERY_CATEGORIES.includes(i.category));
   if (otherCat.length > 0) grouped['Other'] = [...(grouped['Other'] || []), ...otherCat];
 
@@ -141,7 +197,7 @@ export default function GroceryListPage() {
 
       <div className="grocery-actions">
         <button className="btn btn-primary" onClick={importFromPlan}>
-          📅 Import from Plan
+          Import from Plan
         </button>
         {checkedCount > 0 && (
           <button className="btn btn-outline btn-sm" onClick={clearChecked}>
@@ -159,6 +215,26 @@ export default function GroceryListPage() {
           </>
         )}
       </div>
+
+      {suggestedRestocks.length > 0 && (
+        <div className="suggestions-section">
+          <div className="suggestions-header">
+            <span className="section-label" style={{ marginBottom: 0, marginTop: 0 }}>Suggested Restocks</span>
+            <button className="btn btn-outline btn-sm" onClick={() => setShowSuggestions(s => !s)}>
+              {showSuggestions ? 'Hide' : 'Show'}
+            </button>
+          </div>
+          {showSuggestions && (
+            <div className="suggestions-list">
+              {suggestedRestocks.map(item => (
+                <div key={item} className="suggestion-chip" onClick={() => addSuggestionToList(item)}>
+                  <span>+ {item}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="add-item-form">
         <input

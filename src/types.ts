@@ -13,6 +13,7 @@ export interface Recipe {
   fiber: string;
   shift: string;
   repurpose?: string;
+  calories?: string;
 }
 
 export interface Snack {

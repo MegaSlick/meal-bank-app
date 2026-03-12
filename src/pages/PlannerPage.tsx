@@ -111,6 +111,48 @@ interface PickerModal {
   mealType: typeof MEAL_TYPES[number];
 }
 
+// Calculate cooking streak (consecutive days with at least 1 cooked meal)
+function calcStreak(cooked: CookedMeals): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let streak = 0;
+  const d = new Date(today);
+
+  // Check today first — if nothing cooked today, start from yesterday
+  const todayKey = dateKey(d);
+  const hasTodayMeal = Object.keys(cooked).some(k => k.startsWith(todayKey + ':'));
+  if (!hasTodayMeal) {
+    d.setDate(d.getDate() - 1);
+  }
+
+  while (true) {
+    const dk = dateKey(d);
+    const hasMeal = Object.keys(cooked).some(k => k.startsWith(dk + ':'));
+    if (!hasMeal) break;
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+
+  return streak;
+}
+
+// Suggest recipes for an empty slot based on shift tips
+function getSuggestions(mealType: typeof MEAL_TYPES[number], plan: WeekPlan, dk: string): typeof recipes {
+  // Filter by meal category
+  const pool = recipes.filter(r => r.category === mealType);
+  // Exclude already planned this week
+  const weekIds = new Set<string>();
+  Object.values(plan).forEach(day => {
+    MEAL_TYPES.forEach(mt => {
+      const id = (day as Record<string, string | undefined>)[mt];
+      if (id) weekIds.add(id);
+    });
+  });
+  // Avoid what's already planned
+  void dk;
+  return pool.filter(r => !weekIds.has(r.id)).slice(0, 3);
+}
+
 export default function PlannerPage() {
   const [weekOffset, setWeekOffset] = useState(0);
   const [plan, setPlan] = useLocalStorage<WeekPlan>('mealplan-v1', {});
@@ -120,7 +162,7 @@ export default function PlannerPage() {
   const [pickerSearch, setPickerSearch] = useState('');
   const navigate = useNavigate();
 
-  // suppress unused lint — pantry is read by depletePantryForRecipe
+  // suppress unused lint
   void pantry;
 
   const weekDates = getWeekDates(weekOffset);
@@ -193,7 +235,20 @@ export default function PlannerPage() {
     return acc + MEAL_TYPES.filter(m => cooked[`${dk}:${m}`]).length;
   }, 0);
 
+  const streak = calcStreak(cooked);
   const hasAnyPlanned = plannedCount > 0;
+
+  // Unique recipes cooked this week
+  const weekRecipeIds = new Set<string>();
+  weekDates.forEach(d => {
+    const dk = dateKey(d);
+    MEAL_TYPES.forEach(mt => {
+      if (cooked[`${dk}:${mt}`]) {
+        const rid = plan[dk]?.[mt];
+        if (rid) weekRecipeIds.add(rid);
+      }
+    });
+  });
 
   return (
     <div className="page">
@@ -211,6 +266,16 @@ export default function PlannerPage() {
           <span className="stat-value">{cookedCount}</span>
           <span className="stat-label">Cooked</span>
         </div>
+        <div className="stat-item">
+          <span className="stat-value">{weekRecipeIds.size}</span>
+          <span className="stat-label">Unique</span>
+        </div>
+        {streak > 0 && (
+          <div className="stat-item">
+            <span className="stat-value streak-value">{streak}d</span>
+            <span className="stat-label">Streak</span>
+          </div>
+        )}
         <div className="stat-item" style={{ flex: 1, alignItems: 'flex-start' }}>
           <div className="progress-bar-wrap" style={{ width: '100%' }}>
             <div className="progress-bar-fill" style={{ width: `${(plannedCount / 21) * 100}%` }} />
@@ -222,7 +287,7 @@ export default function PlannerPage() {
       <div className="grocery-actions" style={{ marginBottom: 20 }}>
         {hasAnyPlanned && (
           <button className="btn btn-outline" onClick={() => downloadICS(weekDates, plan)}>
-            📅 Export to Calendar (.ics)
+            Export to Calendar (.ics)
           </button>
         )}
         <button className="btn btn-outline btn-sm" onClick={() => setWeekOffset(0)}>
@@ -302,6 +367,32 @@ export default function PlannerPage() {
               <h3>Pick a {picker.mealType} recipe</h3>
               <button className="modal-close" onClick={() => setPicker(null)}>&#10005;</button>
             </div>
+
+            {/* Quick suggestions */}
+            {!pickerSearch && (() => {
+              const suggestions = getSuggestions(picker.mealType, plan, picker.dateKey);
+              if (suggestions.length === 0) return null;
+              return (
+                <div className="picker-suggestions">
+                  <div className="picker-suggestions-label">Quick picks</div>
+                  <div className="picker-suggestions-row">
+                    {suggestions.map(r => (
+                      <button
+                        key={r.id}
+                        className="picker-suggestion-chip"
+                        onClick={() => {
+                          setMeal(picker.dateKey, picker.mealType, r.id);
+                          setPicker(null);
+                        }}
+                      >
+                        {r.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             <div className="modal-search">
               <input
                 autoFocus

@@ -1023,6 +1023,469 @@ input, textarea, select {
   transition: width 0.3s;
 }
 
+/* ===== ACCESS GATE ===== */
+.access-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+  padding: 24px;
+}
+
+.access-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 48px 40px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.access-card h2 {
+  color: var(--navy);
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+.access-card p {
+  color: var(--subtext);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.access-card input {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.access-card input:focus {
+  border-color: var(--teal);
+}
+
+.access-wrong {
+  color: var(--red);
+  font-size: 0.85rem;
+  margin-top: -6px;
+  margin-bottom: 8px;
+}
+
+/* ===== RECIPE CARD IMAGE WRAP ===== */
+.recipe-card-img-wrap {
+  position: relative;
+}
+
+/* ===== FAVORITES ===== */
+.fav-btn {
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--border);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.fav-btn:hover { color: var(--red); }
+.fav-btn.active { color: var(--red); }
+
+.card-fav {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  z-index: 2;
+}
+
+.detail-fav {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 2;
+}
+
+.recipe-detail-hero-wrap {
+  position: relative;
+}
+
+/* ===== NOTES BADGE ===== */
+.card-notes-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  z-index: 2;
+  color: var(--teal);
+}
+
+/* ===== MATCH BADGES ===== */
+.match-badge-wrap {
+  margin-top: 4px;
+}
+
+.match-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: var(--warm-gray);
+  color: var(--subtext);
+}
+
+.match-badge.high {
+  background: var(--light-sage);
+  color: #3d7a40;
+}
+
+.match-badge.full {
+  background: var(--sage);
+  color: white;
+}
+
+.match-missing {
+  font-size: 0.72rem;
+  color: var(--orange);
+  margin-top: 4px;
+}
+
+/* ===== USER NOTES ===== */
+.user-notes-section {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 2px solid var(--warm-gray);
+}
+
+.user-notes-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  min-height: 80px;
+  background: var(--white);
+  transition: border-color 0.2s;
+}
+
+.user-notes-textarea:focus {
+  border-color: var(--teal);
+}
+
+/* ===== COOK MODE ===== */
+.cook-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: var(--navy);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cook-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: rgba(0,0,0,0.2);
+}
+
+.cook-exit-btn {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cook-exit-btn:hover { color: white; }
+
+.cook-step-counter {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+}
+
+.cook-ing-toggle {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cook-ing-toggle:hover,
+.cook-ing-toggle.active {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: white;
+}
+
+.cook-progress {
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+}
+
+.cook-progress-fill {
+  height: 100%;
+  background: var(--teal);
+  transition: width 0.3s;
+}
+
+.cook-timers-strip {
+  display: flex;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+
+.cook-timer-pill {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--teal);
+  white-space: nowrap;
+}
+
+.cook-timer-pill.urgent {
+  background: var(--orange);
+  animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  to { opacity: 0.6; }
+}
+
+.cook-ingredients-panel {
+  background: rgba(0,0,0,0.3);
+  padding: 16px 24px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.cook-ingredients-panel h4 {
+  font-size: 0.85rem;
+  color: var(--teal);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cook-ingredients-panel ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 4px;
+}
+
+.cook-ingredients-panel li {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+  padding: 2px 0;
+}
+
+.cook-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  text-align: center;
+  gap: 24px;
+}
+
+.cook-step-text {
+  font-size: 1.4rem;
+  line-height: 1.7;
+  max-width: 700px;
+  color: rgba(255,255,255,0.95);
+}
+
+.cook-timer-btn {
+  font-size: 1rem;
+}
+
+.cook-active-timer {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
+}
+
+.cook-timer-done {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--sage);
+}
+
+.cook-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: rgba(0,0,0,0.2);
+}
+
+.cook-nav-btn {
+  color: rgba(255,255,255,0.7);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 12px;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cook-nav-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.cook-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.cook-done-btn {
+  font-size: 1rem;
+  padding: 12px 28px;
+}
+
+.cook-start-btn {
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+/* ===== STREAK ===== */
+.streak-value {
+  color: var(--orange);
+}
+
+/* ===== GROCERY SUGGESTIONS ===== */
+.suggestions-section {
+  background: var(--light-teal);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.suggestions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.suggestions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.suggestion-chip {
+  padding: 5px 14px;
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--teal);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--teal);
+  transition: all 0.2s;
+}
+
+.suggestion-chip:hover {
+  background: var(--teal);
+  color: white;
+}
+
+/* ===== PICKER SUGGESTIONS ===== */
+.picker-suggestions {
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--warm-gray);
+}
+
+.picker-suggestions-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--subtext);
+  margin-bottom: 8px;
+}
+
+.picker-suggestions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.picker-suggestion-chip {
+  padding: 5px 12px;
+  border-radius: 12px;
+  background: var(--light-teal);
+  color: var(--teal);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.picker-suggestion-chip:hover {
+  background: var(--teal);
+  color: white;
+}
+
 /* ===== MOBILE ===== */
 @media (max-width: 600px) {
   .page { padding: 20px 16px 80px; }

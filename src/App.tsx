@@ -1,4 +1,5 @@
-import { Routes, Route, NavLink, useNavigate, useParams } from 'react-router-dom';
+import { Routes, Route, NavLink } from 'react-router-dom';
+import AccessGate from './components/AccessGate';
 import MealBankPage from './pages/MealBankPage';
 import RecipeDetailPage from './pages/RecipeDetailPage';
 import PlannerPage from './pages/PlannerPage';
@@ -13,9 +14,9 @@ function Nav() {
       <div className="nav-inner">
         <span className="nav-brand">The Meal Bank</span>
         <div className="nav-links">
-          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/">Meal Bank</NavLink>
+          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/">Meals</NavLink>
           <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/planner">Planner</NavLink>
-          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/grocery">Grocery List</NavLink>
+          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/grocery">Grocery</NavLink>
           <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/pantry">Pantry</NavLink>
           <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/snacks">Snacks</NavLink>
           <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/beans101">Beans 101</NavLink>
@@ -27,7 +28,7 @@ function Nav() {
 
 export default function App() {
   return (
-    <>
+    <AccessGate>
       <Nav />
       <Routes>
         <Route path="/" element={<MealBankPage />} />
@@ -38,9 +39,6 @@ export default function App() {
         <Route path="/snacks" element={<SnacksPage />} />
         <Route path="/beans101" element={<Beans101Page />} />
       </Routes>
-    </>
+    </AccessGate>
   );
 }
-
-// Re-export for use in pages
-export { useNavigate, useParams };
